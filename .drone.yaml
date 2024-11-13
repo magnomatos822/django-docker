@@ -1,0 +1,22 @@
+---
+kind: pipeline
+type: docker
+name: deploy-django
+
+steps:
+  - name: setup
+    image: python:3.9
+    environment:
+      SECRET_KEY:
+        from_secret: secret_key
+      DATABASE_URL:
+        from_secret: database_url
+    commands:
+      - pip install -r requirements.txt
+      - python manage.py migrate
+      - python manage.py collectstatic --noinput
+      - python manage.py runserver 0.0.0.0:8000
+
+trigger:
+  branch:
+    - main
